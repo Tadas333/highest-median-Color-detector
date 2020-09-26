@@ -1,25 +1,44 @@
-
+#Author Tadas Orentas 
 
 
 import numpy as np
 import cv2
-
-
-
+from PIL import Image
+import scipy.misc
 
 
 # load the image
-image = cv2.imread("redcar.png")
+st = cv2.imread("test1.png")
+image = np.float32(st)
 
-# define the color bounds
+hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+
+# define the color bounds, try out several different color bounds depending on image brightneess
 blue = [
-	([86, 31, 4], [220, 88, 50])
+	#([86, 31, 4], [220, 88, 50])
+	([112, 119, 88], [117, 206, 253])
+	 
+    
 ]
 red = [
-    ([0, 20, 100], [68, 70, 220])
+    #([0, 20, 100], [68, 70, 220])
+	#([0, 135, 65], [179, 233, 245])
+	([0, 39, 24], [23, 255, 187])
+
 ]
 green = [
-    ([0, 45, 0], [65, 255, 65])
+   #([0, 45, 0], [65, 255, 65])
+	([53, 124, 124], [179, 213, 255])
+]
+
+white = [
+    ([0, 0, 96], [255, 255, 255])
+]
+
+black = [
+    #([0, 0, 0], [50, 50, 50])
+	([0, 0, 0], [0, 90, 128])
 ]
 
 
@@ -30,38 +49,49 @@ def dec(color):
 		upper = np.array(upper, dtype = "uint8")
 
 		
-		mask = cv2.inRange(image, lower, upper)
-		output = cv2.bitwise_and(image, image, mask = mask)
-		ret,thresh=cv2.threshold(output,0,200,cv2.THRESH_BINARY_INV)
- 	
-	 
-		cv2.imshow("output",thresh)
+		mask = cv2.inRange(hsv, lower, upper)
+	
+		cv2.imshow("out2", image)
+		cv2.imshow("out3", mask)
 
-		area = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
+		return(mask)
 
-		print('area =', cv2.countNonZero(area))
-		return(area)
 
 bluearea=dec(blue)
 greenarea=dec(green)
 redarea=dec(red)
+whitearea=dec(white)
+blackarea=dec(black)
 	
-ba = np.sum(bluearea)
-ga = np.sum(greenarea)
-ra = np.sum(redarea)
-print(ba, ga, ra)
+ba = np.sum(bluearea) *3
+ga = np.sum(greenarea)*3
+ra = np.sum(redarea)*3
+wa = np.sum(whitearea) *.80
+bla = np.sum(blackarea)
+print(ba, ra, ga, wa, bla)
 
 
-if (ba >= ra) and (ba >= ga): 
+print(image.dtype)
+
+if (ba >= ra) and (ba >= ga) and (ba >= wa) and (ba >= bla): 
 	maincolor = ("blue")
+	cv2.imshow("out3", bluearea)
 	
-if (ra >= ba) and (ra >= ga): 
+if (ra >= ba) and (ra >= ga) and (ra >= wa) and (ra >= bla): 
 	maincolor = ("red")
+	cv2.imshow("out3", redarea)
 	
-if (ga >= ba) and (ga >= ra): 
+if (ga >= ba) and (ga >= ra) and (ga >= wa) and (ga >= bla): 
 	maincolor = ("green")
+	cv2.imshow("out3", greenarea)
+
+if (wa >= ba) and (wa >= ga) and (wa >= ra) and (wa >= bla): 
+	maincolor = ("white")
+	cv2.imshow("out3", whitearea)
 	
- 
+if (bla >= ba) and (bla >= ra) and (bla >= wa) and (bla >= ga): 
+	maincolor = ("black")
+	cv2.imshow("out3", blackarea)
 
 print(maincolor)
 
